@@ -1,0 +1,89 @@
+||$poll - makes a vote
+Example: `$poll <Options>`||
+
+$avatar - view avatar
+Example: `$avatar <User (optional)>`
+
+$say - the bot repeats what is written after the command
+Example: `$say <Text to output>`
+
+$emoji - shows emoji
+Example: `$emoji <Emoji>`
+
+$tictactoe - Tic-tac-toe
+Example: `$tictactoe`
+
+$rand - returns a random number
+Example: `$rand <From> <To>`
+
+||$translate - translates text
+Example: `$say <Text to output>`|| sep
+
+$changelog - shows version changes
+Example: `$changelog <Version>`
+
+$help - this is displayed
+Example: `$help`
+
+$suggestion - Suggests or makes a suggestion to the bot
+Example: `$suggestion <Text>` sep
+
+$snipe - shows a list of deleted messages
+Example: `$snipe`
+
+$delall - Removes all channels and roles with the specified content in the title
+Example: `$delall <Content>`
+
+$clear - Clears the chat
+Example: `$clear <Number> <User> <Content> <Channel>`
+
+$kick - kicks someone
+Example: `$kick <User> <Reason>`
+
+$ban - bans someone
+Example: `$kick <User> <Time> <Reason>`
+
+$mute - mutes someone
+Example: `$mute <User> <Time> <Reason>` 
+
+$slowmode - sets slowmode in channel 
+Example: `$slowmode <Time>` sep
+
+$play - plays the audio
+Example: `$play <Search>` sep
+
+$dep - transfers money to the bank
+Example: `$dep <Amount | all>`
+
+$withdraw - transfers money from the bank to the balance
+Example `$withdraw <Amount | all>`
+
+$work - earn money, no risk of loss
+Example: `$work`
+
+$crime - earn more money but risk losing
+Example: `$crime`
+
+$rob - steals money from another user, with the risk of losing
+Example `$rob <User>`
+
+$leaderboard - shows the users with the most money
+Example: `$leaderboard`
+
+$create_item - creates an item in the store
+Example: `$create_item <Name> <Cost> <Role> <Description (optional)> <Stock (optional)>`
+
+$about - Information about the product in the store
+Example: `$about <Search>`
+
+$buy - Buys an item in the store
+Example: `$buy <Search> <Amount (optional)>` sep
+
+$settings - Shows settings
+Example: `$settings`
+
+$whitelist - allows the specified member to change settings
+Example: `$whitelist <User>`
+
+$delall - Removes all channels and roles with the specified content in the title
+Example: `$delall <Content>`

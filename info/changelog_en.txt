@@ -1,0 +1,71 @@
+**Version 1.4**
+sep
+1.4 - adding this command
+1.4.1 - Categories added to changelog
+1.4.2 - args for $changelog command
+sep
+**Version 2.0**
+sep
+Beta 2.0 - $prefix command has been added
+Pre-release 2.0 - development of $prefix command stopped
+2.0 - Slash commands, poll command
+2.01 - deleted command
+sep
+**Version 2.1**
+sep
+2.1 - $avatar command, and message deleted in $say and $sayembed commands as well
+$avatar command was planned in pre-alpha, but i couldn't find member.avatar.url lol
+2.11 - better logging, $help command fix, to see your avatar you don't have to type yourself in command $avatar
+2.12 - 4 deprecated commands
+2.13 - added number of deleting messages in clear
+sep
+**Version 2.2**
+sep
+2.2 - added $play command, fixed $help
+sep
+**Version 2.3**
+sep
+2.3 - $emoji command
+2.35 - youtube playing $play
+2.351 - fix $help
+sep
+**Version 2.4**
+sep
+2.4 - added $stop command (why not)
+2.41 - bug fixes
+2.42 - english version of command names
+2.43 - speed up downloading in command $play, $changelog grouping (like there)
+2.44 - support of shortened youtube links in command $play
+2.45 - newgrounds support in command $play
+sep
+**Version 3.0**
+sep
+Beta - mute command (buggy)
+Pre-release - support for keywords search in command $play, removed newgrounds support
+Pre-release 2 - embed when start playing video with it's own details
+3.0 - added time for $ban and $mute commands, $stop can be called as $skip
+3.01 - idk
+3.02 - slash commands play and stop started working
+3.03 - updated $changelog
+3.04 - slash command fix
+3.05 - removed $list
+russian translations for command names
+sep
+**Version 3.9**
+sep
+3.9 - $help remake, multi-file system
+3.91 - added $suggestion
+3.95 - bugfixes, added command
+sep
+**Version 4.0**
+sep
+alpha - bot rewritten to discord.py 2.0
+Beta - help and syntax commands rewrite
+Pre-release - changelog command rewrite
+4.0 - Added command $snipe, updated $random
+4.01 - bot division (no changes)
+4.02 - added $translate command
+sep
+**Version 5.0**
+sep
+4.98 - added $logging command with logs!

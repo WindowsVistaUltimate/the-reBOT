@@ -1,0 +1,47 @@
+import discord
+from discord.ext import commands
+import json
+from random import randint as random
+import sqlite3
+import re
+conn = sqlite3.connect("./database/chatbot.db")
+cur = conn.cursor()
+class Chat(commands.Cog):
+    command = commands.hybrid_command
+    def __init__(self, bot):
+        self.bot = bot
+        super().__init__()
+    @command(description="Задает канал для чата")
+    async def chat(self, ctx: commands.Context, channel: discord.TextChannel):
+        if ctx.author.guild_permissions.manage_messages or ctx.author.id == 733572313425117195:
+            cur.execute("SELECT * FROM channels WHERE id = ?", (channel.id,))
+            if cur.fetchall():
+                cur.execute("DELETE FROM channels WHERE id = ?", (channel.id,))
+                action = "удален"
+            else:
+                cur.execute("INSERT INTO channels(id) VALUES(?)", (channel.id,))
+                action = "добавлен"
+            await ctx.send(embed=discord.Embed(title=f"Канал для чата был {action}!"), ephemeral=True)
+        else:
+            await ctx.send(embed=discord.Embed(title="Вы не админ"), ephemeral=True)
+    @commands.Cog.listener("on_message")
+    async def on_chat(self, message: discord.Message):
+        if message.author.id != self.bot.user.id:
+            cur.execute("SELECT * FROM channels WHERE id = ?", (message.channel.id,))
+            if cur.fetchall():
+                badwords = ["москал", "крым", "слава украине", "нахуй", "пидор", "тупой", "киев", "zv", "донбасс", "запорож", "херсон", "хуйло", "путин", "зеленский", "россию", "днр", "лнр"]
+                filtered = re.sub(r"<(@\d+)>", r"\1", message.content).replace("@everyone", "everyone").replace("@here", "here")
+                filtered = re.sub(r"(https|http|ftp)://^t^e^n^o^r\S+", r"[ссылка]", filtered)
+                filtered = re.sub(r"discord.gg/\S+", r"[приглашение]", filtered)
+                for a in badwords: filtered = re.sub(a, r"\*\*\*\*\*", filtered, flags=re.IGNORECASE)
+                if len(filtered) == 1 or filtered == "[ссылка]" or filtered == "[приглашение]": filtered = ""
+                filtered = filtered.strip()
+                if filtered and not message.channel.nsfw: 
+                    cur.execute("SELECT * FROM msgs WHERE content = ?", (filtered,))
+                    if not cur.fetchall():
+                        cur.execute("INSERT INTO msgs(content) VALUES(?)", (filtered,))
+                    conn.commit()
+                cur.execute("SELECT * FROM msgs order by RANDOM() LIMIT 1")
+            await message.reply(cur.fetchall()[0][0])
+async def setup(bot):
+    await bot.add_cog(Chat(bot))

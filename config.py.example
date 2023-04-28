@@ -1,0 +1,27 @@
+from discord import Intents
+
+# Your bot token
+
+token="Your token"
+
+# Intents
+
+intents=Intents.all()
+
+# list
+
+prefix=["$", "/", "<@745199394764226612>", "<@745199394764226612> "]
+
+# string
+
+prefix="!"
+
+# ffmpeg path
+
+ffmpeg_path = "ffmpeg"
+
+# example
+
+token="Your token"
+intents=Intents.default()
+prefix="?"

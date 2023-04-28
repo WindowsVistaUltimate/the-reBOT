@@ -1,0 +1,28 @@
+from discord.ext import commands
+from discord import ui, Embed, Interaction
+class Poll(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        super().__init__()
+    @commands.hybrid_command(aliases=['голосование'], description="Делает голосование")
+    async def poll(self, ctx, name, a, b, j=False, d=False, e=False, f=False, g=False, h=False, i=False):
+        args = (a, b, j, d, e, f, g, h, i)
+        b = ui.View()
+        j = 0
+        for i in args:
+            if i: b.add_item(ui.Button(label=f"{i}: 0", custom_id=f"pollrow {j} 0:0:0:0:0:0:0:0:0 {i} {args}")); j+=1
+            else: break
+        await ctx.send(embed=Embed(title = name), view=b)
+    @commands.Cog.listener("on_interaction")
+    async def on_poll(self, ctx: Interaction):
+        args = ctx.data.get('custom_id', '').split(" ")
+        if args[0] == "pollrow":
+            votes = [i for i in args[2]]
+            votes[int(args[1])] = str(int(votes[int(args[1])]) + 1)
+            modified = ":".join(votes)
+            view = ui.View()
+            for a in votes:
+                view.add_item(ui.Button(label = ""))
+            await ctx.response.edit_message(view=view)
+async def setup(bot):
+    await bot.add_cog(Poll(bot))
