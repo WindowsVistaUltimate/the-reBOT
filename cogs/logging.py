@@ -56,6 +56,34 @@ class Logging(commands.Cog):
             view.add_item(discord.ui.Button(style=discord.ButtonStyle.link, label="Ссылка на сообщение", url=before.jump_url))
             await before.guild.get_channel(channel).send(embed=embed, view=view)
     @commands.Cog.listener()
+    async def on_channel_edit(self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel):
+        cur.execute("SELECT channel FROM logchannels WHERE guild = ?", (before.guild.id,))
+        channel = cur.fetchall()
+        if channel: channel = channel[0][0]
+        else: return
+        embed=discord.Embed(title="Изменен канал")
+        if before.name != after.name:
+            embed.add_field(name="Старое название:",value=f"```diff\n- {before.name}```")
+            embed.add_field(name="Новое название:",value=f"```diff\n+ {after.name}```")
+        try: before.slowmode_delay
+        except: ...
+        else: 
+            if before.slowmode_delay != after.slowmode_delay:
+                embed.add_field(name="Старый кулдаун:",value=f"```diff\n- {int(before.slowmode_delay)}```")
+                embed.add_field(name="Новый кулдаун:",value=f"```diff\n+ {int(after.slowmode_delay)}```")
+        try: before.bitrate
+        except: ...
+        else: 
+            if before.bitrate != after.bitrate:
+                embed.add_field(name="Старый битрейт:",value=f"```diff\n- {int(before.bitrate)}```")
+                embed.add_field(name="Новый битрейт:",value=f"```diff\n+ {int(after.bitrate)}```")
+        if before.category != after.category:
+            if before.category: embed.add_field(name="Старая категория:",value=f"```diff\n+ {before.category.name}```")
+            if after.category: embed.add_field(name="Новая категория:",value=f"```diff\n+ {after.category.name}```")
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(style=discord.ButtonStyle.link, label="Ссылка на сообщение", url=before.jump_url))
+        await before.guild.get_channel(channel).send(embed=embed, view=view)
+    @commands.Cog.listener()
     async def on_message_delete(self, msg: discord.Message):
         cur.execute("SELECT channel FROM logchannels WHERE guild = ?", (msg.guild.id,))
         channel = cur.fetchall()

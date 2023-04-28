@@ -69,3 +69,4 @@ sep
 **Version 5.0**
 sep
 4.98 - added $logging command with logs!
+4.99 - logs added
