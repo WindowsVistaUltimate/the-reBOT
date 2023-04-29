@@ -4,7 +4,7 @@ if __name__ == '__main__':
 	from random import choice, random
 	import discord, os, asyncio
 	from discord.ext import commands
-	# import sqlite3
+	from cogs.lang import get_guild_lang
 	from sys import argv
 	if len(argv) > 1:
 		if argv[1] == "--hide-window" and os.name == 'nt':
@@ -35,23 +35,26 @@ iscreator = lambda id: id == 733572313425117195 or id == 984534426656587787
 if __name__ == "__main__":
 	@bot.event
 	async def on_command_error(ctx: commands.Context, error):
-		#if guild_langs[str(ctx.guild.id)] == "ru":
-		fewarguments = f"{x} Отсутствует аргумент"
-		typeerror = f'{x} введен неправильный тип'
-		nopermissions = choice([f"{x} Вы ни такой высокий дядька что бы эту крутую штучку делать", f"{x} Нет, тебе нельзя", f"{x} Да кто тебе позволяет???"])
-		errora = "Произошла ошибка"
-		typeenum = {"int": "Целое число", "str": "Текст", "float": "Целое или дробное число", "discord.Member": "Юзер", "discord.TextChannel": "Канал", "discord.Emoji": "Эмодзи"}
-		#else:
-		#	fewarguments = f"{x} Too few arguments"
-		#	typeerror = f'{x} wrng type'
-		#	nopermissions = f"{x} Not enough permissions"
-		#	errora = "Uncaught exception:"
+		if get_guild_lang(ctx.guild.id) == "ru":
+			fewarguments = f"{x} Отсутствует аргумент"
+			typeerror = f'{x} введен неправильный тип: Нужно'
+			typeerror2 = 'для параметра'
+			nopermissions = choice([f"{x} Вы ни такой высокий дядька что бы эту крутую штучку делать", f"{x} Нет, тебе нельзя", f"{x} Да кто тебе позволяет???"])
+			errora = "Произошла ошибка"
+			typeenum = {"int": "Целое число", "str": "Текст", "float": "Целое или дробное число", "discord.Member": "Юзер", "discord.TextChannel": "Канал", "discord.Emoji": "Эмодзи"}
+		else:
+			fewarguments = f"{x} Too few arguments"
+			typeerror = f'{x} Wrong type:'
+			typeerror2 = 'is required for a parameter called'
+			nopermissions = f"{x} Not enough permissions"
+			errora = "Uncaught exception:"
+			typeenum = {"int": "Integer", "str": "Text", "float": "Decimal", "discord.Member": "User", "discord.TextChannel": "Channel", "discord.Emoji": "Emoji"}
 		match error:
 			case CommandNotFound(): ...
 			case MissingRequiredArgument(): await ctx.send(embed=discord.Embed(title=f"{fewarguments}: `{error.param.name}`", colour=discord.Colour.from_hsv(random(), 1, 1)))
 			case BadArgument(): 
 				error = str(error).split('"')
-				await ctx.send(embed=discord.Embed(title=f"{typeerror}: Нужно `{typeenum[error[1]]}` для параметра `{error[3]}`"))
+				await ctx.send(embed=discord.Embed(title=f"{typeerror} `{typeenum[error[1]]}` {typeerror2} `{error[3]}`"))
 			case MissingPermissions(): await ctx.send(embed=discord.Embed(title=nopermissions, colour=discord.Colour.from_hsv(random(), 1, 1)))
 			case _:
 				await ctx.send(embed=discord.Embed(title=errora, description=f"```{error}```"))
@@ -86,31 +89,31 @@ if __name__ == "__main__":
 	
 # -------------------------- Приветствие при входе на сервер ---------------------------- #
 
-#if __name__ == "__main__":
-#	@client.event
-#	async def on_guild_join(guild: discord.Guild):
-#		langbtns = discord.ui.View(timeout=None)
-#		langbtns.add_item(discord.ui.Button(label="English", custom_id="lang_en"))
-#		langbtns.add_item(discord.ui.Button(label="Русский", custom_id="lang_ru"))
-#		try:
-#			joinchannel = guild.system_channel
-#			await joinchannel.send(embed=
-#				discord.Embed(
-#					title="Thanks for adding me to server!", 
-#					description="To begin, choose language below:"
-#				),
-#				view = langbtns
-#			)
-#		except:
-#			try:
-#				await guild.text_channels[0].send(embed=
-#				discord.Embed(
-#					title="Thanks for adding me to server!", 
-#					description="To begin, choose language below:"
-#				),
-#				view = langbtns)
-#			except:
-#				pass
+if __name__ == "__main__":
+	@bot.event
+	async def on_guild_join(guild: discord.Guild):
+		langbtns = discord.ui.View(timeout=None)
+		langbtns.add_item(discord.ui.Button(label="English", custom_id="lang_en"))
+		langbtns.add_item(discord.ui.Button(label="Русский", custom_id="lang_ru"))
+		try:
+			joinchannel = guild.system_channel
+			await joinchannel.send(embed=
+				discord.Embed(
+					title="Thanks for adding me to server!", 
+					description="To begin, choose language below:"
+				),
+				view = langbtns
+			)
+		except:
+			try:
+				await guild.text_channels[0].send(embed=
+				discord.Embed(
+					title="Thanks for adding me to server!", 
+					description="To begin, choose language below:"
+				),
+				view = langbtns)
+			except:
+				pass
 
 # -------------------------- Команды и бот -------------------------------- #
 

@@ -1,8 +1,16 @@
 import discord
 from discord.ext import commands
 from botik import x
-import json
+import sqlite3
 from random import randint as random
+conn = sqlite3.connect("./database/langs.db")
+cur = conn.cursor()
+def get_guild_lang(guildid: int) -> str:
+    """fetches sqlite database to get language"""
+    cur.execute("SELECT lang FROM langs WHERE guildid = ?", (guildid,))
+    data = cur.fetchall()
+    if data: return data[0][0]
+    else: return "en"
 class Language(commands.Cog):
     command = commands.hybrid_command
     def __init__(self, bot):
@@ -19,6 +27,7 @@ class Language(commands.Cog):
             await ctx.send(embed=discord.Embed(title=f"{x} Недостаточно прав!"))
     @commands.Cog.listener("on_interaction")
     async def on_lang(self, interaction: discord.Interaction):
+        cur.execute("CREATE TABLE IF NOT EXISTS langs(guildid INTEGER, lang TEXT)")
         if interaction.type == discord.InteractionType.component:
             send = interaction.response.send_message
             try:
@@ -29,12 +38,10 @@ class Language(commands.Cog):
                 if option == "lang_ru" or option == "lang_en":
                     lang = option.split("_")[1]
                     if interaction.user.guild_permissions.administrator:
-                        with open("./database/langs.json", "r", encoding="utf-8") as f:
-                            await send("e", ephemeral=True)
-                            db = json.loads(f.read())
-                            db[str(interaction.guild.id)] = lang
-                        with open("./database/langs.json", "w", encoding="utf-8") as f:
-                            f.write(json.dumps(db))
+                        cur.execute("SELECT guildid FROM langs WHERE guildid = ?", (interaction.guild.id,))
+                        if cur.fetchall(): cur.execute("DELETE FROM langs WHERE guildid = ?", (interaction.guild.id,))
+                        cur.execute("INSERT INTO langs(guildid, lang) VALUES(?,?)", (interaction.guild.id, lang))
+                        conn.commit()
                         if lang == "ru":
                             await send(embed=discord.Embed(title="Язык успешно выбран!"), ephemeral=True)
                         if lang == "en":

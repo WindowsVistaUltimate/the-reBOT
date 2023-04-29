@@ -26,7 +26,10 @@ $help - this is displayed
 Example: `$help`
 
 $suggestion - Suggests or makes a suggestion to the bot
-Example: `$suggestion <Text>` sep
+Example: `$suggestion <Text>` 
+
+$help - changes language of a bot
+Example: `$lang` sep
 
 $snipe - shows a list of deleted messages
 Example: `$snipe`
