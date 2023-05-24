@@ -242,8 +242,8 @@ class Moderationn(commands.Cog):
                 f"Servers: {len(self.bot.guilds)}\n" +
                 f"Last online: <t:{last_online}:F>, <t:{last_online}:R>\n" +
                 f"Runtime: <t:{runtime}:F>, <t:{runtime}:R>\n" +
-                f"Used RAM: {pr_mem} МБ / {total - used + pr_mem} МБ\n" +
-                f"Total used RAM: {used} МБ / {total} МБ\n" +
+                f"Used RAM: {pr_mem} MB / {total - used + pr_mem} MB\n" +
+                f"Total used RAM: {used} MB / {total} MB\n" +
                 f"Library: discord.py {discord.__version__} (Python {sys.version.split(' ')[0]})")
         await ctx.send(embed=discord.Embed(title=title, description=desc))
     @commands.hybrid_command(description="Automod")
