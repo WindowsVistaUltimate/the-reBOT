@@ -5,7 +5,16 @@ if __name__ == '__main__':
 	import discord, os, asyncio
 	from discord.ext import commands
 	from cogs.lang import get_guild_lang
-	from sys import argv
+	from sys import argv, stdout, stdin
+	async def repl(string: str="") -> str:
+		while True:
+			await asyncio.get_event_loop().run_in_executor(None, lambda s=string: stdout.write(s+' '))
+			result = (await asyncio.get_event_loop().run_in_executor(None, stdin.readline)).strip()
+			match result:
+				case "shutdown" | "s": raise SystemExit()
+				case "restart" | "r": 
+					os.system(f'start python "{__file__}"')
+					raise SystemExit()
 	if len(argv) > 1:
 		if argv[1] == "--hide-window" and os.name == 'nt':
 			import ctypes
@@ -18,7 +27,7 @@ if __name__ == '__main__':
 	if not os.path.isfile("config.py"): raise SystemExit("Missing config.py")
 
 	from config import *
-
+	is_first_time = True
 	bot = commands.Bot(
 		command_prefix = prefix, 
 		help_command=None, 
@@ -82,11 +91,14 @@ if __name__ == "__main__":
 
 	@bot.event
 	async def on_ready():
-		activity = discord.Game(name=f"$help | {len(bot.guilds)} серверов c {len(bot.users)} людьми")
+		activity = discord.Game(name=f"$help | {len(bot.guilds)} servers with {len(bot.users)} people")
 		await bot.change_presence(activity=activity, status=discord.Status.idle)
 		if set(bot.tree.get_commands()) != set(await bot.tree.fetch_commands()): await bot.tree.sync()
 		print(f"Бот онлайн! {str(bot.user)}")
-	
+		if(is_first_time == True):
+			asyncio.create_task(repl())
+		is_first_time == False
+
 # -------------------------- Приветствие при входе на сервер ---------------------------- #
 
 if __name__ == "__main__":
@@ -125,4 +137,4 @@ if __name__ == "__main__":
 		print("starting...")
 		try: await bot.start(token)
 		except: raise SystemExit("Token is invalid, or can't connect to discord servers")
-	asyncio.run(main(token))
+	while True: asyncio.run(main(token))

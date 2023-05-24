@@ -5,50 +5,74 @@ from discord import ButtonStyle, app_commands
 import sqlite3
 from ast import literal_eval as eval_
 from botik import chk, iscreator, x
+from cogs.lang import get_guild_lang
+from typing import Union, Callable
 command = commands.hybrid_command
 conn = sqlite3.connect("./database/deleted_messages.db")
 cur = conn.cursor()
+async def showpage(member: Union[discord.Member, discord.User], ctx: Union[discord.Interaction, commands.Context], page: int, send: Callable, edit: Callable=None) -> None:
+    """we don't need to type that twice"""
+    if not edit: edit = send; isinteraction = False
+    else: isinteraction = True
+    if get_guild_lang(ctx.guild) == "ru":
+        notexist = "Такой страницы не существует!"
+        deleted = "Удаленные сообщения"
+        by = "от"
+        attachments = "Приклепленные файлы"
+        embed2 = "Эмбед"
+        nodesc = "Без описания"
+        sent = "Отправлено"
+        deleted2 = "Удалено"
+    else:
+        notexist = "This page does not exist!"
+        deleted = "Deleted messages"
+        by = "by"
+        attachments = "Attachments"
+        embed2 = "Embed"
+        nodesc = "No description"
+        sent = "Sent"
+        deleted2 = "Deleted"
+    cur.execute(f"SELECT * FROM msgs WHERE guild_id = {ctx.guild.id}")
+    raw = cur.fetchall()
+    try:
+        m = raw[page-1]
+    except IndexError:
+        if isinteraction: await send(embed=discord.Embed(title=notexist), ephemeral=True)
+        else: await send(embed=discord.Embed(title=notexist))
+        return
+    embed = discord.Embed(
+        title=deleted,
+        description=f"{m[0][:4000]} - {by} <@{m[2]}>",
+        color=discord.Colour(m[5])
+    )
+    attach = ", ".join(eval_(m[6]))
+    if m[10] and not m[9]:
+        embed.add_field(name=embed2, value=m[10][:1024])
+    if m[9] and not m[10]:
+        embed.add_field(name=m[9], value=nodesc)
+    if m[9] and m[10]:
+        embed.add_field(name=m[9], value=m[10][:1024])
+    if attach:
+        embed.add_field(name=attachments, value=attach[:-2])
+    embed.add_field(name=sent, value=f"<t:{m[8]}:f>")
+    embed.add_field(name=deleted2, value=f"<t:{m[7]}:f>", inline=True)
+    embed.set_footer(text=f"{member.name} · {page}/{len(raw)}")
+    embed.set_author(name=m[4], icon_url=m[3])
+    view = discord.ui.View(timeout=None)
+    add = view.add_item
+    button = discord.ui.Button
+    add(button(label="", emoji="◀", custom_id=f"goto {page-1} {member.id}"))
+    add(button(label="", emoji="▶", custom_id=f"goto {page+1} {member.id}", row=0))
+    add(button(label="", emoji="🗑", row=0, style=ButtonStyle.red, custom_id=f"delete 1 {member.id}"))
+    add(button(label="", emoji="🧹", row=0, style=ButtonStyle.red, custom_id=f"delete -1 {member.id}"))
+    await edit(embed=embed, view=view)
 class Snipe(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         super().__init__()
-    @command(aliases=["c", "s", "с", "snipe"], description="Показывается удаленные сообщения")
-    async def снайп(self, ctx: commands.Context, page: int=1):
-        cur.execute(f"SELECT * FROM msgs WHERE guild_id = {ctx.guild.id}")
-        raw = cur.fetchall()
-        try:
-            m = raw[page-1]
-        except IndexError:
-            await ctx.send(embed=discord.Embed(title="Такой страницы не существует!"))
-            return
-        print(m)
-        embed = discord.Embed(
-            title="Удаленные сообщения",
-            description=f"{m[0][:4000]} - от <@{m[2]}>",
-            color=discord.Colour(m[5])
-        )
-        attach = ", ".join(eval_(m[6]))
-        if attach:
-            embed.add_field(name="Приклепленные файлы", value=attach[:-2])
-        if m[9] and not m[8]:
-            embed.add_field(name="Эмбед", value=m[10])
-        if m[8] and not m[9]:
-            embed.add_field(name=m[8], value="Без описания")
-        if m[8] and m[9]:
-            embed.add_field(name=m[8], value=m[9])
-        embed.add_field(name="Отправлено", value=f"<t:{m[8]}:f>")
-        embed.add_field(name="Удалено", value=f"<t:{m[7]}:f>", inline=True)
-        embed.set_footer(text=f"{ctx.author.name} · {page}/{len(raw)}")
-        print(m)
-        embed.set_author(name=m[4], icon_url=m[3])
-        view = discord.ui.View(timeout=None)
-        add = view.add_item
-        button = discord.ui.Button
-        add(button(label="", emoji="◀", custom_id=f"goto {page-1} {ctx.author.id}"))
-        add(button(label="", emoji="▶", custom_id=f"goto {page+1} {ctx.author.id}", row=0))
-        add(button(label="", emoji="🗑", row=0, style=ButtonStyle.red, custom_id=f"delete 1 {ctx.author.id}"))
-        add(button(label="", emoji="🧹", row=0, style=ButtonStyle.red, custom_id=f"delete -1 {ctx.author.id}"))
-        await ctx.send(embed=embed, view=view)
+    @command(aliases=["c", "s", "с", "снайп"], description="Shows deleted messages")
+    async def snipe(self, ctx: commands.Context, page: int=1):
+        await showpage(ctx.author, ctx, page, ctx.send)
     @commands.Cog.listener()
     async def on_message_delete(self, msg: discord.Message):
         cur.execute("""CREATE TABLE IF NOT EXISTS msgs(
@@ -143,48 +167,7 @@ class Snipe(commands.Cog):
                         await send(f"{x} Вы не отправляли команду!", ephemeral=True)
                 if option.startswith("goto"):
                     try:
-                        v = option.split(" ")
-                        page = int(v[1])
-                        user = int(v[2])
-                        if page > 0:
-                            if chk(interaction.user.id, user):
-                                cur.execute(f"SELECT * FROM msgs WHERE guild_id = {interaction.guild.id} LIMIT 1 OFFSET {page-1}")
-                                m = cur.fetchall()[0]
-                                cur.execute(f"SELECT rowid FROM msgs WHERE guild_id = {interaction.guild.id}")
-                                msglen = len(cur.fetchall())
-                                author = f" - от <@{m[2]}>"
-                                embed = discord.Embed(
-                                    title="Удаленные сообщения",
-                                    description=f"{m[0][:4000]}{author if m[0] else ''}",
-                                    color=discord.Colour(m[5])
-                                )
-                                f"1/{len(m)}"
-                                attach = ", ".join(eval_(m[6]))
-                                if attach:
-                                    embed.add_field(name="Приклепленные файлы", value=attach[:-2])
-                                if m[10] and not m[9]:
-                                    embed.add_field(name="Эмбед", value=m[10][:1024])
-                                if m[9] and not m[10]:
-                                    embed.add_field(name=m[9], value="Без описания")
-                                if m[9] and m[10]:
-                                    embed.add_field(name=m[9], value=m[10][:1024])
-                                embed.add_field(name="Отправлено", value=f"<t:{m[8]}:f>")
-                                embed.add_field(name="Удалено", value=f"<t:{m[7]}:f>", inline=True)
-                                embed.set_footer(text=f"{interaction.user.display_name} · {page}/{msglen}")
-                                embed.set_author(name=m[4], icon_url=m[3])
-                                view = discord.ui.View(timeout=None)
-                                add = view.add_item
-                                button = discord.ui.Button
-                                add(button(label="", emoji="◀", custom_id=f"goto {page-1} {user}", row=0))
-                                add(button(label="", emoji="▶", custom_id=f"goto {page+1} {user}", row=0))
-                                add(button(label="", emoji="🗑", row=0, style=ButtonStyle.red, custom_id=f"delete {page} {user}"))
-                                add(button(label="", emoji="🧹", row=0, style=ButtonStyle.red, custom_id=f"delete -1 {user}"))
-                                await interaction.response.edit_message(embed=embed, view=view)
-                            else:
-                                await send(f"{x} Вы не отправляли команду!", ephemeral=True)
-                        else:
-                            await send(x, ephemeral=True)
-                    except IndexError:
-                        await send(f"{x} Это последнее сохраненное удаленное сообщение", ephemeral=True)
+                        await showpage(interaction.user, interaction, int(option.split(" ")[1]), interaction.response.send_message, interaction.response.edit_message)
+                    except Exception as e: print(e)
 async def setup(bot):
     await bot.add_cog(Snipe(bot))

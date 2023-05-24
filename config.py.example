@@ -25,3 +25,4 @@ ffmpeg_path = "ffmpeg"
 token="Your token"
 intents=Intents.default()
 prefix="?"
+ffmpeg_path = "ffmpeg"

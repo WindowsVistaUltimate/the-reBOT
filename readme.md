@@ -1,8 +1,27 @@
 # the reBOT
-Бот для дискорда
+A discord bot
 
-## [ссылка](https://discord.com/api/oauth2/authorize?client_id=745199394764226612&permissions=8&scope=bot%20applications.commands)
+## [Invite link](https://discord.com/api/oauth2/authorize?client_id=745199394764226612&permissions=8&scope=bot%20applications.commands)
 
-Примечание: это только часть исходного кода, но этой части достаточно, что-бы запустить бота
+This is not all of the source code, but enough to run this bot
 
-TODO: Поддержка английского, система ранга, автомод
+TODO: Rank system, automod
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+## ‌
+<sub>[website](bit.ly/randrep)</sub>
